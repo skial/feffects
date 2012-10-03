@@ -224,6 +224,9 @@ class Tween {
 	#if ( !nme && js || flash8 )
 		static var _timer	: haxe.Timer;
 		public static var INTERVAL		= 10;
+		#if raf
+		static var _rafId	: Int;
+		#end
 	#end
 	
 	public static var DEFAULT_EASING	= easingEquation;
@@ -253,8 +256,10 @@ class Tween {
 		if ( !_isTweening )
 		{
 			#if ( !nme && js || flash8 )
+				#if !raf
 				_timer 		= new haxe.Timer( INTERVAL ) ;
 				_timer.run 	= cb_tick;
+				#end
 			#else
 				Lib.current.stage.addEventListener( Event.ENTER_FRAME, cb_tick );
 			#end
@@ -279,11 +284,16 @@ class Tween {
 		if ( _aTweens.isEmpty() )
 		{
 			#if ( !nme && js || flash8 )
+				#if !raf	
 				if ( _timer != null )
 				{
 					_timer.stop() ;
 					_timer	= null ;
 				}
+				#else
+				untyped __js__('window').cancelAnimationFrame(_rafId);
+				_rafId = null;
+				#end
 			#else
 				Lib.current.stage.removeEventListener( Event.ENTER_FRAME, cb_tick );
 			#end
@@ -319,8 +329,10 @@ class Tween {
 		if ( !_isTweening )
 		{
 			#if ( !nme && js || flash8 )
+				#if !raf
 				_timer 		= new haxe.Timer( INTERVAL ) ;
 				_timer.run 	= cb_tick;
+				#end
 			#else
 				Lib.current.stage.addEventListener( Event.ENTER_FRAME, cb_tick );
 			#end
@@ -332,6 +344,10 @@ class Tween {
 	static function cb_tick( #if ( nme || flash9 ) ?_ #end ) : Void	{
 		for ( i in _aTweens )
 			i.doInterval();
+			
+		#if ( raf && js && !nme )
+		_rafId = untyped __js__('window').requestAnimationFrame(cb_tick);
+		#end
 	}
 		
 	/**
