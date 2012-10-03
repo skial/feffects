@@ -143,6 +143,12 @@ class TweenProperty extends Tween{
 	var ___onUpdate			: Dynamic;
 	var ___onUpdateParams	: Array<Dynamic>;
 	
+	#if js
+	static var __cssMap		= { top:'px', left:'px', bottom:'px', right:'px', width:'px', height:'px', opacity:'' };
+	var __isCss				: Bool;
+	var __cssValue			: String;
+	#end
+	
 	public function new( target : Dynamic, prop : String, value : Float, duration : Int, ?easing : Easing, autostart = false, ?onUpdate : Dynamic, ?onUpdateParams : Array<Dynamic>, ?onFinish : Dynamic, ?onFinishParams : Array<Dynamic> ) {
 		this.target			= target;
 		this.property		= prop;
@@ -150,11 +156,23 @@ class TweenProperty extends Tween{
 		if( onUpdateParams != null )
 			___onUpdateParams	= ___onUpdateParams.concat( onUpdateParams );
 		
-		super( Reflect.getProperty( target, property ), value, duration, easing, autostart, __onUpdate, onFinish, onFinishParams );
+		#if js
+		__isCss 			= Reflect.hasField(__cssMap, property);
+		__cssValue 			= __isCss ? Reflect.field(__cssMap, property) : '';
+		var from 			= !__isCss ? Reflect.getProperty( target, property ) : Std.parseFloat(Reflect.getProperty( target.style, property ));
+		#else
+		var from 			= Reflect.getProperty( target, property );
+		#end
+		trace(from);
+		super( from, value, duration, easing, autostart, __onUpdate, onFinish, onFinishParams );
 	}
 	
 	function __onUpdate( n : Float ) {
+		#if js
+		!__isCss ? Reflect.setProperty( target, property, n ) : Reflect.setProperty( target.style, property, n + __cssValue);
+		#else
 		Reflect.setProperty( target, property, n );
+		#end
 		if ( ___onUpdate != null )
 		{
 			___onUpdateParams[ 0 ]	= n;
