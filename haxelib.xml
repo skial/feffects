@@ -1,0 +1,13 @@
+<project name="feffects" url="http://mromecki.fr/" license="BSD">
+    <user name="filt3rek"/>
+    <tag v="tween"/>
+    <tag v="transition"/>
+    <tag v="cross"/>
+    <tag v="flash"/>
+    <tag v="js"/>
+    <tag v="neko"/>
+    <tag v="cpp"/>
+    <tag v="nme"/>
+    <description>Set of effects (tweens, sineloops...) targeting Flash / JS / NME (Neko, C++, Windows, Linux, OSX, Android, iOS, webOS, BlackBerry, HTML5)</description>
+    <version name="1.3.3">1.3.3 : Based on ENTER_FRAME instead of Timer on NME & Flash</version>
+</project>
