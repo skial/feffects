@@ -157,7 +157,7 @@ class TweenProperty extends Tween{
 			___onUpdateParams	= ___onUpdateParams.concat( onUpdateParams );
 		
 		#if js
-		__isCss 			= Reflect.hasField(__cssMap, property);
+		__isCss 			= (Reflect.hasField(target, 'style') && Reflect.hasField(__cssMap, property));
 		__cssValue 			= __isCss ? Reflect.field(__cssMap, property) : '';
 		var from 			= !__isCss ? Reflect.getProperty( target, property ) : Std.parseFloat(Reflect.getProperty( target.style, property ));
 		#else
