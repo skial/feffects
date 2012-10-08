@@ -163,7 +163,7 @@ class TweenProperty extends Tween{
 		#else
 		var from 			= Reflect.getProperty( target, property );
 		#end
-		trace(from);
+		
 		super( from, value, duration, easing, autostart, __onUpdate, onFinish, onFinishParams );
 	}
 	
