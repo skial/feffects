@@ -52,6 +52,7 @@ class TweenObject {
 	public var duration		(default, null)			: Int;
 	public var easing		(default, null)			: Easing;
 	public var isPlaing		(get_isPlaying, null)	: Bool;
+	public var isClamped	(default, null)			: Bool;
 	function get_isPlaying() {
 		for ( tween in tweens ) 
 			if ( tween.isPlaying )
@@ -88,6 +89,7 @@ class TweenObject {
 		tweens	= new List<TweenProperty>();
 		for ( key in Reflect.fields( properties ) ) {
 			var tp = new TweenProperty( target, key, Reflect.field( properties, key ), duration, easing, false );
+			tp.clamp(isClamped);
 			tp.onFinish( _onFinish, [ tp ] ).start();
 			tweens.add( tp );
 		}
@@ -119,6 +121,11 @@ class TweenObject {
 	public function stop( ?finish : Bool ) {
 		for ( tweenProp in tweens )
 			tweenProp.stop( finish );
+	}
+	
+	public function clamp(value:Bool = true) : TweenObject {
+		isClamped = value;
+		return this;
 	}
 	
 	public function onFinish( f : Dynamic, ?params : Array<Dynamic> ) : TweenObject {
@@ -252,6 +259,8 @@ class Tween {
 	var _onUpdateParams	: Array<Dynamic>;
 	var _onFinishParams	: Array<Dynamic>;
 	
+	var _isClamped		:Bool;
+	
 	static function AddTween( tween : Tween ) : Void {
 		if ( !_isTweening )
 		{
@@ -369,6 +378,7 @@ class Tween {
 		isPlaying		= false;
 		isPaused		= false;
 		isReversed		= false;
+		_isClamped		= false;
 		
 		if ( easing != null )
 			_easingF = easing;
@@ -482,6 +492,11 @@ class Tween {
 		return this;
 	}
 	
+	public function clamp(value:Bool) {
+		_isClamped = value;
+		return this;
+	}
+	
 	/**
 	* Set the [easingFunc] equation to use for tweening
 	*/
@@ -501,7 +516,8 @@ class Tween {
 			curTime = stamp - _startTime + _offsetTime;
 		}
 		
-		var curVal = getCurVal( curTime );
+		var curVal = !_isClamped ? getCurVal( curTime ) :  Math.floor( getCurVal( curTime ) );
+		
 		if ( curTime >= duration || curTime < 0 )
 			finish();
 		else {
